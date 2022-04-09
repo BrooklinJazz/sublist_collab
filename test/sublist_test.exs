@@ -53,15 +53,34 @@ defmodule SublistTest do
     assert Sublist.sublist([1, 1], [1]) == :unequal
   end
 
-  @tag :benchmark
   test "benchmark" do
     random_list = Enum.map(1..1000, fn _ -> Enum.random(0..9) end)
     random_sublist = Enum.slice(random_list, 997..1000)
 
+    count = length(random_list) - length(random_sublist)
+
     Benchee.run(
       %{
         "original" => fn -> Sublist.sublist(random_sublist, random_list) end,
-        "optimized" => fn -> Optimized.sublist(random_sublist, random_list) end
+        "optimized" => fn -> Optimized.sublist(random_sublist, random_list) end,
+        "optimized2" => fn -> Optimized.sublist(random_sublist, random_list, count) end
+      },
+      memory_time: 10
+    )
+  end
+
+  @tag timeout: :infinity
+  test "benchmark2" do
+    random_list = Enum.map(1..100_000, fn _ -> Enum.random(0..9) end)
+    random_sublist = Enum.slice(random_list, 90000..100_000) ++ [10]
+
+    count = length(random_list) - length(random_sublist)
+
+    Benchee.run(
+      %{
+        "original" => fn -> Sublist.sublist(random_sublist, random_list) end,
+        "optimized" => fn -> Optimized.sublist(random_sublist, random_list) end,
+        "optimized2" => fn -> Optimized.sublist(random_sublist, random_list, count) end
       },
       memory_time: 10
     )
