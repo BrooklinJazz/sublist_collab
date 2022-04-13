@@ -9,18 +9,26 @@ defmodule Optimized do
     :unequal
   end
 
+  def sublist(candidate, list_b) do
+    sublist(candidate, list_b, length(list_b) - length(candidate))
+  end
+
   # n ^ 2
   # m * n
   # [4, 3, 2] vs [1, 2, 3, 4, 5]
   # [4, 3, 2] vs [2, 3, 4, 5]
   # [4, 3, 2] vs [3, 4, 5]
   # [4, 3, 2] vs [4, 5]
-  def sublist(candidate, list_b) do
+  def sublist(_candidate, _list_b, 0) do
+    :unequal
+  end
+
+  def sublist(candidate, list_b, count) do
     if starts_with?(list_b, candidate) do
       :sublist
     else
       list_b_tl = tl(list_b)
-      sublist(candidate, list_b_tl)
+      sublist(candidate, list_b_tl, count - 1)
     end
   end
 
@@ -34,3 +42,22 @@ defmodule Optimized do
     end
   end
 end
+
+# optimized =
+# for elem <- list_b, item <- list_a, elem == item do
+#   item
+# end
+# |> Enum.any?(fn sub -> sub == list_a)
+# case optimized do
+#  true -> :optimized
+#  false -> :unequal
+# end
+# =======================================================
+
+# length = length(list_a)
+
+# Enum.reduce(list_b, [], fn e, r ->
+#  #
+# end)
+
+# Enum.take_while(list_b, )
